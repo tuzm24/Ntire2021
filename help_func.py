@@ -103,7 +103,7 @@ class myUtil(object):
     def intoRealFolder(dir):
         dirs = myUtil.getDirlist(dir)
         if len(dirs)==0:
-            return os.path.basename(os.path.dirname(dir))
+            return os.path.dirname(dir)
         return myUtil.intoRealFolder(dirs[0])
 
     @staticmethod
