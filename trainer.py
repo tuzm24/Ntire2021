@@ -96,7 +96,7 @@ class Trainer():
                         sr, hr, scale, self.args.rgb_range, dataset=d
                     )
                     self.ckp.log[-1, idx_data, -1] += utility.calc_psnr(
-                        lr, hr, scale, self.args.yuv_range, dataset=d
+                        lr, hr, scale, self.args.rgb_range, dataset=d
                     )
                     if self.args.save_gt:
                         save_list.extend([lr, hr])

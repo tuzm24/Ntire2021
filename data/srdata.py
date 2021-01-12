@@ -21,8 +21,10 @@ class SRData(data.Dataset):
         self.input_large = (args.model == 'VDSR')
         self.scale = args.scale
         self.idx_scale = 0
-        
-        self._set_filesystem(args.dir_data)
+        if self.train:
+            self._set_filesystem(args.dir_data)
+        else:
+            self._set_filesystem(args.demo)
         if args.ext.find('img') < 0:
             path_bin = os.path.join(self.apath, 'bin')
             os.makedirs(path_bin, exist_ok=True)
