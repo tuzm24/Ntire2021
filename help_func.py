@@ -74,7 +74,7 @@ class myUtil(object):
         flist = os.listdir(path)
         returnlist = []
         for fpath in flist:
-            if os.path.isdir(fpath):
+            if os.path.isdir(os.path.join(path, fpath)):
                 returnlist.append(os.path.join(path, fpath))
         return returnlist
 
