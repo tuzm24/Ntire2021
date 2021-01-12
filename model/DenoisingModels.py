@@ -2,6 +2,9 @@ from model.subNets import *
 from model.cbam import *
 
 
+def make_model(args, parent=False):
+    return ntire_rdb_gd_rir_ver2(args)
+
 class ntire_rdb_gd_rir_ver1(nn.Module):
     def __init__(self, input_channel=3, numforrg=4, numofrdb=16, numofconv=8, numoffilters=64, t=1):
         super(ntire_rdb_gd_rir_ver1, self).__init__()
