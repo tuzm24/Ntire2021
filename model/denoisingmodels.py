@@ -6,7 +6,7 @@ def make_model(args, parent=False):
     return ntire_rdb_gd_rir_ver2(args)
 
 class ntire_rdb_gd_rir_ver1(nn.Module):
-    def __init__(self, input_channel=3, numforrg=4, numofrdb=16, numofconv=8, numoffilters=64, t=1):
+    def __init__(self, args, input_channel=3, numforrg=4, numofrdb=16, numofconv=8, numoffilters=64, t=1):
         super(ntire_rdb_gd_rir_ver1, self).__init__()
 
         self.numforrg = numforrg  # num of rdb units in one residual group
@@ -50,7 +50,7 @@ class ntire_rdb_gd_rir_ver1(nn.Module):
         return out + x
 
 class ntire_rdb_gd_rir_ver2(nn.Module):
-    def __init__(self, input_channel=3, numofmodules=2, numforrg=4, numofrdb=16, numofconv=8, numoffilters=64, t=1):
+    def __init__(self, args, input_channel=3, numofmodules=2, numforrg=4, numofrdb=16, numofconv=8, numoffilters=64, t=1):
         super(ntire_rdb_gd_rir_ver2, self).__init__()
 
         self.numofmodules = numofmodules # num of modules to make residual
