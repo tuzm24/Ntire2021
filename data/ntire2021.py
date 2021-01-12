@@ -33,6 +33,13 @@ class Ntire2021(srdata.SRData):
                     filename, self.ext[1]
                 )
             ))
+        if not self.train and not self.args.test_only:
+            stride = len(names_hr)//self.args.valid_num
+            names_hr = names_hr[::stride]
+            names_lr = [n[::stride] for n in names_lr]
+
+
+
         # names_hr = names_hr[self.begin - 1:self.end]
         # names_lr = [n[self.begin - 1:self.end] for n in names_lr]
 

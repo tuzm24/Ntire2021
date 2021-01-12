@@ -77,7 +77,7 @@ class Trainer():
         epoch = self.optimizer.get_last_epoch()
         self.ckp.write_log('\nEvaluation:')
         self.ckp.add_log(
-            torch.zeros(1, len(self.loader_test), len(self.scale))
+            torch.zeros(1, len(self.loader_test), len(self.scale)+1)
         )
         self.model.eval()
 
@@ -95,6 +95,9 @@ class Trainer():
                     self.ckp.log[-1, idx_data, idx_scale] += utility.calc_psnr(
                         sr, hr, scale, self.args.rgb_range, dataset=d
                     )
+                    self.ckp.log[-1, idx_data, -1] += utility.calc_psnr(
+                        lr, hr, scale, self.args.yuv_range, dataset=d
+                    )
                     if self.args.save_gt:
                         save_list.extend([lr, hr])
 
@@ -102,13 +105,15 @@ class Trainer():
                         self.ckp.save_results(d, filename[0], save_list, scale)
 
                 self.ckp.log[-1, idx_data, idx_scale] /= len(d)
+                self.ckp.log[-1, idx_data, -1] /= len(d)
                 best = self.ckp.log.max(0)
                 self.ckp.write_log(
-                    '[{} x{}]\tPSNR: {:.3f} (Best: {:.3f} @epoch {})'.format(
+                    '[{} x{}]\tPSNR: {:.3f} (Best: {:.3f} (Blur : {:.3f}) @epoch {})'.format(
                         d.dataset.name,
                         scale,
                         self.ckp.log[-1, idx_data, idx_scale],
                         best[0][idx_data, idx_scale],
+                        best[0][idx_data, -1],
                         best[1][idx_data, idx_scale] + 1
                     )
                 )

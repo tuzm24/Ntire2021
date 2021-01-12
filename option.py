@@ -24,6 +24,12 @@ parser.add_argument('--dir_data', type=str, default='ntire_deblur_track1',
                     help='dataset directory')
 parser.add_argument('--dir_demo', type=str, default='ntire_deblur_track1',
                     help='demo image directory')
+
+# Validation Data test Frames (Must 30*n)
+
+parser.add_argument('--valid_num', type=str, default=30,
+                    help='valudation Data test Frames')
+
 parser.add_argument('--data_train', type=str, default='Ntire2021',
                     help='train dataset name')
 parser.add_argument('--data_test', type=str, default='Ntire2021',
