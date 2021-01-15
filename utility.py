@@ -99,10 +99,10 @@ class checkpoint():
                 'batch_size':self.args.batch_size,
                 'training_data': os.path.basename(self.args.dir_data),
                 'patch_size': self.args.patch_size,
-                'epochs' : epoch,
-                'base_psnr': anc,
-                'best_psnr': best,
-                'latest_psnr':latest}
+                'epochs' : int(epoch),
+                'base_psnr': float(anc),
+                'best_psnr': float(best),
+                'latest_psnr':float(latest)}
         self.df.loc[self.name] = data
         self.df.to_csv('./result.csv')
 
