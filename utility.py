@@ -97,7 +97,7 @@ class checkpoint():
                 'model_name': self.args.model,
                 'lr': self.args.lr,
                 'batch_size':self.args.batch_size,
-                'training_data': os.path.basename(self.args.dir_data),
+                'training_data': self.args.dir_data,
                 'patch_size': self.args.patch_size,
                 'epochs' : int(epoch),
                 'base_psnr': float(anc),
