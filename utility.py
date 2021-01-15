@@ -15,6 +15,7 @@ import imageio
 import torch
 import torch.optim as optim
 import torch.optim.lr_scheduler as lrs
+import pandas as pd
 
 class timer():
     def __init__(self):
@@ -47,7 +48,11 @@ class checkpoint():
         self.ok = True
         self.log = torch.Tensor()
         now = datetime.datetime.now().strftime('%Y-%m-%d-%H:%M:%S')
-
+        self.now = now
+        self.dfcol = ['date', 'model_name', 'lr', 'batch_size', 'training_data', 'patch_size','epochs','training_loss',  'test_psnr']
+        args.save = args.model + '_' + os.path.basename(args.dir_data) + '_(' + args.lr + '_' + args.batch_size + ')_' +now
+        self.name = args.save
+        self.df = self.initCSVFile()
         if not args.load:
             if not args.save:
                 args.save = now
@@ -78,6 +83,28 @@ class checkpoint():
             f.write('\n')
 
         self.n_processes = 8
+
+    def initCSVFile(self):
+        filename = './result.csv'
+        if not os.path.exists(filename):
+            df = pd.DataFrame(columns=self.dfcol)
+        else:
+            df = pd.read_csv(filename)
+        return df
+
+    def writeCSVFile(self, best, anc):
+        data = {'date': self.now,
+                'model_name': self.args.model,
+                'lr': self.args.lr,
+                'batch_size':self.args.batch_size,
+                'training_data': os.path.basename(self.args.dir_data),
+                'patch_size': self.args.patch_size,
+                'epochs' : self.args.epochs,
+                'before_process': anc,
+                'valid_psnr': best}
+        self.df.loc[self.name] = data
+        self.df.to_csv('./result.csv')
+
 
     def get_path(self, *subdir):
         return os.path.join(self.dir, *subdir)
