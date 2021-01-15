@@ -118,9 +118,11 @@ class Trainer():
                     )
                 )
 
+                self.ckp.writeCSVFile(best[0][idx_data, idx_scale], self.ckp.log[-1, idx_data, idx_scale],
+                                      best[0][idx_data, -1], best[1][idx_data, idx_scale] + 1)
+
         self.ckp.write_log('Forward: {:.2f}s\n'.format(timer_test.toc()))
         self.ckp.write_log('Saving...')
-
         if self.args.save_results:
             self.ckp.end_background()
 
