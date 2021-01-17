@@ -41,6 +41,8 @@ class Trainer():
         self.loader_train.dataset.set_scale(0)
         for batch, (lr, hr, _,) in enumerate(self.loader_train):
             lr, hr = self.prepare(lr, hr)
+            if self.args.jpeg_grid_add:
+                lr = lr[:3]
             timer_data.hold()
             timer_model.tic()
 
@@ -89,6 +91,8 @@ class Trainer():
                 for lr, hr, filename in tqdm(d, ncols=80):
                     lr, hr = self.prepare(lr, hr)
                     sr = self.model(lr, idx_scale)
+                    if self.args.jpeg_grid_add:
+                        lr = lr[:3]
                     sr = utility.quantize(sr, self.args.rgb_range)
 
                     save_list = [sr]
