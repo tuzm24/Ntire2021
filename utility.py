@@ -89,7 +89,7 @@ class checkpoint():
         if not os.path.exists(filename):
             df = pd.DataFrame(columns=self.dfcol)
         else:
-            df = pd.read_csv(filename)
+            df = pd.read_csv(filename, index_col=0)
         return df
 
     def writeCSVFile(self, best,latest, anc, epoch):
