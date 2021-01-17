@@ -93,7 +93,7 @@ class ntire_rdb_gd_rir_ver2(nn.Module):
         out = self.layer9(out)
 
         # global residual 구조
-        return out + x
+        return out + x[:3]
 
 
 
