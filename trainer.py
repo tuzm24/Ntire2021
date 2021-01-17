@@ -90,7 +90,7 @@ class Trainer():
                     lr, hr = self.prepare(lr, hr)
                     sr = self.model(lr, idx_scale)
                     if self.args.jpeg_grid_add:
-                        lr = lr[:3]
+                        lr = lr[:,:3,...]
                     sr = utility.quantize(sr, self.args.rgb_range)
 
                     save_list = [sr]
