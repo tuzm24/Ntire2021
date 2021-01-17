@@ -105,7 +105,6 @@ class SRData(data.Dataset):
         lr, hr, filename = self._load_file(idx)
         if self.args.jpeg_grid_add:
             lr=self.getJPEGGrid(lr)
-            hr=self.getJPEGGrid(hr)
         pair = self.get_patch(lr, hr)
         pair = common.set_channel(*pair, n_channels=self.args.n_colors)
         pair_t = common.np2Tensor(*pair, rgb_range=self.args.rgb_range)
