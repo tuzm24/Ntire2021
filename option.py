@@ -29,6 +29,8 @@ parser.add_argument('--dir_demo', type=str, default='ntire_deblur_track1',
 
 parser.add_argument('--valid_num', type=str, default=30,
                     help='valudation Data test Frames')
+parser.add_argument('--jpeg_grid_add', action='store_true',
+                    help='jpeg 8x8 grid add')
 
 parser.add_argument('--data_train', type=str, default='Ntire2021',
                     help='train dataset name')

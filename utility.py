@@ -47,7 +47,7 @@ class checkpoint():
         self.args = args
         self.ok = True
         self.log = torch.Tensor()
-        now = datetime.datetime.now().strftime('%Y-%m-%d-%H:%M:%S')
+        now = datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
         self.now = now
         self.dfcol = ['date', 'model_name', 'lr', 'batch_size', 'training_data', 'patch_size','epochs','base_psnr', 'best_psnr', 'latest_psnr']
         args.save = args.model + '_' + os.path.basename(args.dir_data) + '_(' + str(args.lr) + '_' + str(args.batch_size) + ')_' +now
@@ -93,12 +93,12 @@ class checkpoint():
         return df
 
     def writeCSVFile(self, best,latest, anc, epoch):
-        data = {'date': self.now,
-                'model_name': self.args.model,
-                'lr': self.args.lr,
-                'batch_size':self.args.batch_size,
-                'training_data': self.args.dir_data,
-                'patch_size': self.args.patch_size,
+        data = {'date': str(self.now),
+                'model_name': str(self.args.model),
+                'lr': str(self.args.lr),
+                'batch_size':str(self.args.batch_size),
+                'training_data': str(self.args.dir_data),
+                'patch_size': str(self.args.patch_size),
                 'epochs' : int(epoch),
                 'base_psnr': float(anc),
                 'best_psnr': float(best),

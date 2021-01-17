@@ -62,3 +62,5 @@ class Ntire2021(srdata.SRData):
         self.dir_lr = myUtil.intoRealFolder(self.dir_lr)
 
 
+
+
