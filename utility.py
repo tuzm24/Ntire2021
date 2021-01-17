@@ -48,6 +48,7 @@ class checkpoint():
         self.ok = True
         self.log = torch.Tensor()
         now = datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
+
         self.now = now
         self.dfcol = ['date', 'model_name', 'lr', 'batch_size', 'training_data', 'patch_size','epochs','base_psnr', 'best_psnr', 'latest_psnr']
         args.save = args.model + '_' + os.path.basename(args.dir_data) + '_(' + str(args.lr) + '_' + str(args.batch_size) + ')_' +now
@@ -61,6 +62,7 @@ class checkpoint():
             self.dir = os.path.join('..', 'experiment', args.load)
             if os.path.exists(self.dir):
                 self.log = torch.load(self.get_path('psnr_log.pt'))
+                self.name = self.args.load
                 print('Continue from epoch {}...'.format(len(self.log)))
             else:
                 args.load = ''
@@ -99,10 +101,10 @@ class checkpoint():
                 'batch_size':str(self.args.batch_size),
                 'training_data': str(self.args.dir_data),
                 'patch_size': str(self.args.patch_size),
-                'epochs' : int(epoch),
-                'base_psnr': float(anc),
-                'best_psnr': float(best),
-                'latest_psnr':float(latest)}
+                'epochs' : str(int(epoch)),
+                'base_psnr': str(float(anc)),
+                'best_psnr': str(float(best)),
+                'latest_psnr':str(float(latest))}
         self.df.loc[self.name] = data
         self.df.to_csv('./result.csv')
 
