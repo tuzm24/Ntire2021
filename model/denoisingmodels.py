@@ -52,7 +52,8 @@ class ntire_rdb_gd_rir_ver1(nn.Module):
 class ntire_rdb_gd_rir_ver2(nn.Module):
     def __init__(self, args, input_channel=3, numofmodules=2, numforrg=4, numofrdb=16, numofconv=8, numoffilters=64, t=1):
         super(ntire_rdb_gd_rir_ver2, self).__init__()
-
+        if args.jpeg_grid_add:
+            input_channel += 1
         self.numofmodules = numofmodules # num of modules to make residual
         self.numforrg = numforrg  # num of rdb units in one residual group
         self.numofrdb = numofrdb  # num of all rdb units

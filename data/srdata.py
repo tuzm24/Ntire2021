@@ -9,6 +9,7 @@ import numpy as np
 import imageio
 import torch
 import torch.utils.data as data
+import numpy as np
 
 class SRData(data.Dataset):
     def __init__(self, args, name='', train=True, benchmark=False):
@@ -90,8 +91,21 @@ class SRData(data.Dataset):
             with open(f, 'wb') as _f:
                 pickle.dump(imageio.imread(img), _f)
 
+    def getJPEGGrid(self, img):
+        h, w, _ = img.shape
+        mask = np.zeros((h, w, 1), dtype=img.dtype)
+        mask[:,7::8,:] = 128
+        mask[:,8::8,:] = 128
+        mask[7::8,:,:] = 128
+        mask[8::8,:,:] = 128
+        return np.concatenate((img,mask), axis=2)
+
+
     def __getitem__(self, idx):
         lr, hr, filename = self._load_file(idx)
+        if self.args.jpeg_grid_add:
+            lr=self.getJPEGGrid(lr)
+            hr=self.getJPEGGrid(hr)
         pair = self.get_patch(lr, hr)
         pair = common.set_channel(*pair, n_channels=self.args.n_colors)
         pair_t = common.np2Tensor(*pair, rgb_range=self.args.rgb_range)
