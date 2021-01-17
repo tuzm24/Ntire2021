@@ -52,8 +52,7 @@ class ntire_rdb_gd_rir_ver1(nn.Module):
 class ntire_rdb_gd_rir_ver2(nn.Module):
     def __init__(self, args, input_channel=3, numofmodules=2, numforrg=4, numofrdb=16, numofconv=8, numoffilters=64, t=1):
         super(ntire_rdb_gd_rir_ver2, self).__init__()
-        if args.jpeg_grid_add:
-            input_channel += 1
+
         self.numofmodules = numofmodules # num of modules to make residual
         self.numforrg = numforrg  # num of rdb units in one residual group
         self.numofrdb = numofrdb  # num of all rdb units
@@ -61,7 +60,7 @@ class ntire_rdb_gd_rir_ver2(nn.Module):
         self.numofkernels = numoffilters
         self.t = t
 
-        self.layer1 = nn.Conv2d(input_channel, self.numofkernels, kernel_size=3, stride=1, padding=1)
+        self.layer1 = nn.Conv2d(input_channel if not args.jpeg_grid_add else input_channel+1, self.numofkernels, kernel_size=3, stride=1, padding=1)
         # self.layer2 = nn.ReLU()
         self.layer3 = nn.Conv2d(self.numofkernels, self.numofkernels, kernel_size=4, stride=2, padding=1)
 
