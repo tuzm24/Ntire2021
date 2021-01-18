@@ -7,7 +7,6 @@ import utility
 import torch
 import torch.nn.utils as utils
 from tqdm import tqdm
-
 class Trainer():
     def __init__(self, args, loader, my_model, my_loss, ckp):
         self.args = args
@@ -19,7 +18,7 @@ class Trainer():
         self.model = my_model
         self.loss = my_loss
         self.optimizer = utility.make_optimizer(args, self.model)
-
+        self.upsampler = torch.nn.Upsample(scale_factor=args.scale, mode='bicubic')
         if self.args.load != '':
             self.optimizer.load(ckp.dir, epoch=len(ckp.log))
 
@@ -97,12 +96,14 @@ class Trainer():
                     self.ckp.log[-1, idx_data, idx_scale] += utility.calc_psnr(
                         sr, hr, scale, self.args.rgb_range, dataset=d
                     )
+
+                    if self.args.save_gt:
+                        save_list.extend([lr, hr])
+                    if self.args.scale>1:
+                        lr = self.upsampler(lr)
                     self.ckp.log[-1, idx_data, -1] += utility.calc_psnr(
                         lr, hr, scale, self.args.rgb_range, dataset=d
                     )
-                    if self.args.save_gt:
-                        save_list.extend([lr, hr])
-
                     if self.args.save_results:
                         self.ckp.save_results(d, filename[0], save_list, scale)
 
