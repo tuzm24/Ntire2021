@@ -18,7 +18,7 @@ class Trainer():
         self.model = my_model
         self.loss = my_loss
         self.optimizer = utility.make_optimizer(args, self.model)
-        self.upsampler = torch.nn.Upsample(scale_factor=args.scale, mode='bicubic')
+        self.upsampler = [torch.nn.Upsample(scale_factor=s, mode='bicubic') for s in args.scale]
         if self.args.load != '':
             self.optimizer.load(ckp.dir, epoch=len(ckp.log))
 
@@ -100,7 +100,7 @@ class Trainer():
                     if self.args.save_gt:
                         save_list.extend([lr, hr])
                     if self.args.scale>1:
-                        lr = self.upsampler(lr)
+                        lr = self.upsampler[idx_scale](lr)
                     self.ckp.log[-1, idx_data, -1] += utility.calc_psnr(
                         lr, hr, scale, self.args.rgb_range, dataset=d
                     )
