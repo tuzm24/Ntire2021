@@ -99,7 +99,7 @@ class Trainer():
 
                     if self.args.save_gt:
                         save_list.extend([lr, hr])
-                    if self.args.scale>1:
+                    if self.args.scale[idx_scale]>1:
                         lr = self.upsampler[idx_scale](lr)
                     self.ckp.log[-1, idx_data, -1] += utility.calc_psnr(
                         lr, hr, scale, self.args.rgb_range, dataset=d
