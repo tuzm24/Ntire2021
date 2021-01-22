@@ -4,7 +4,7 @@ from help_torch import RgbToYcbcr
 from help_torch import YcbcrToRgb
 
 def make_model(args, parent=False):
-    return _NetG()
+    return _NetG(args)
 
 class _Residual_Block(nn.Module):
     def __init__(self):
@@ -151,10 +151,15 @@ class Recon_Block(nn.Module):
 
 
 class _NetG(nn.Module):
-    def __init__(self):
+    def __init__(self,args):
         super(_NetG, self).__init__()
+        self.isjpg = args.jpeg_grid_add
+        if args.jpeg_grid_add:
+            input_channel = 4
+        else:
+            input_channel = 3
         self.rgb_to_yuv = RgbToYcbcr()
-        self.conv_input = nn.Conv2d(in_channels=3, out_channels=256, kernel_size=3, stride=1, padding=1, bias=False)
+        self.conv_input = nn.Conv2d(in_channels=input_channel, out_channels=256, kernel_size=3, stride=1, padding=1, bias=False)
         self.relu1 = nn.PReLU()
         self.conv_down = nn.Conv2d(in_channels=256, out_channels=256, kernel_size=3, stride=2, padding=1, bias=False)
         self.relu2 = nn.PReLU()
@@ -183,9 +188,13 @@ class _NetG(nn.Module):
 
 
     def forward(self, x):
-        yuv_input = self.rgb_to_yuv(x)
+        yuv_input = self.rgb_to_yuv(x[:,:3,...])
         residual = yuv_input
-        out = self.relu1(self.conv_input(yuv_input))
+        if self.isjpg:
+            _input = torch.cat([yuv_input, x[:,3,...]], dim=1)
+        else:
+            _input = yuv_input
+        out = self.relu1(self.conv_input(_input))
         out = self.relu2(self.conv_down(out))
 
         out1 = self.recursive_A(out)
