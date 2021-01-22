@@ -126,7 +126,8 @@ class checkpoint():
 
     def write_log(self, log, refresh=False):
         print(log)
-        self.log_file.write(log + '\n')
+        log_with_date = str(datetime.datetime.now().strftime('[%Y-%m-%d-%H-%M-%S]  ')) + log
+        self.log_file.write(log_with_date + '\n')
         if refresh:
             self.log_file.close()
             self.log_file = open(self.get_path('log.txt'), 'a')
