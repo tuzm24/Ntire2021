@@ -32,7 +32,7 @@ parser.add_argument('--valid_num', type=str, default=30,
 parser.add_argument('--jpeg_grid_add', type=int, default=0,
                     help='jpeg 8x8 grid add')
 parser.add_argument('--jpeg_yuv_domain', action='store_true',
-                    help='jpeg 8x8 grid add')
+                    help='jpeg yuv domain')
 
 parser.add_argument('--data_train', type=str, default='Ntire2021',
                     help='train dataset name')

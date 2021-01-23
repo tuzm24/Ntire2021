@@ -44,7 +44,7 @@ class Trainer():
             lr, hr = self.prepare(lr, hr)
             if self.args.jpeg_yuv_domain:
                 hr = rgb_to_ycbcr(hr)
-                lr[:,:3,...] = rgb_to_ycbcr(lr)
+                lr[:,:3,...] = rgb_to_ycbcr(lr[:,:3,...])
             timer_data.hold()
             timer_model.tic()
             self.optimizer.zero_grad()
@@ -93,10 +93,10 @@ class Trainer():
                     lr, hr = self.prepare(lr, hr)
                     lr_tmp = torch.clone(lr[:,:3,...])
                     if self.args.jpeg_yuv_domain:
-                        lr[:,:3,...] = rgb_to_ycbcr(lr)
+                        lr[:,:3,...] = rgb_to_ycbcr(lr[:,:3,...])
                     sr = self.model(lr, idx_scale)
                     if self.args.jpeg_yuv_domain:
-                        sr[:,:3,...] = ycbcr_to_rgb(sr)
+                        sr[:,:3,...] = ycbcr_to_rgb(sr[:,:3,...])
                     if self.args.jpeg_grid_add or self.args.jpeg_yuv_domain:
                         lr = lr_tmp
                     sr = utility.quantize(sr, self.args.rgb_range)
