@@ -191,7 +191,7 @@ class _NetG(nn.Module):
         yuv_input = self.rgb_to_yuv(x[:,:3,...])
         residual = yuv_input
         if self.isjpg:
-            _input = torch.cat([yuv_input, x[:,3,...]], dim=1)
+            _input = torch.cat([yuv_input, x[:,3:,...]], dim=1)
         else:
             _input = yuv_input
         out = self.relu1(self.conv_input(_input))

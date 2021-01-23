@@ -7,6 +7,9 @@ import utility
 import torch
 import torch.nn.utils as utils
 from tqdm import tqdm
+from help_torch import rgb_to_ycbcr
+from help_torch import ycbcr_to_rgb
+import copy
 class Trainer():
     def __init__(self, args, loader, my_model, my_loss, ckp):
         self.args = args
@@ -40,9 +43,11 @@ class Trainer():
         self.loader_train.dataset.set_scale(0)
         for batch, (lr, hr, _,) in enumerate(self.loader_train):
             lr, hr = self.prepare(lr, hr)
+            if self.args.jpeg_yuv_domain:
+                hr = rgb_to_ycbcr(hr)
+                lr[:,:3,...] = rgb_to_ycbcr(lr)
             timer_data.hold()
             timer_model.tic()
-
             self.optimizer.zero_grad()
             sr = self.model(lr, 0)
             loss = self.loss(sr, hr)
@@ -87,9 +92,14 @@ class Trainer():
                 d.dataset.set_scale(idx_scale)
                 for lr, hr, filename in tqdm(d, ncols=80):
                     lr, hr = self.prepare(lr, hr)
+                    lr_tmp = copy.deepcopy(lr[:,:3,...])
+                    if self.args.jpeg_yuv_domain:
+                        lr[:,:3,...] = rgb_to_ycbcr(lr)
                     sr = self.model(lr, idx_scale)
-                    if self.args.jpeg_grid_add:
-                        lr = lr[:,:3,...]
+                    if self.args.jpeg_yuv_domain:
+                        sr[:,:3,...] = ycbcr_to_rgb(sr)
+                    if self.args.jpeg_grid_add or self.args.jpeg_yuv_domain:
+                        lr = lr_tmp
                     sr = utility.quantize(sr, self.args.rgb_range)
 
                     save_list = [sr]
