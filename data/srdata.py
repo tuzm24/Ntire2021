@@ -93,11 +93,15 @@ class SRData(data.Dataset):
 
     def getJPEGGrid(self, img):
         h, w, _ = img.shape
-        mask = np.zeros((h, w, 1), dtype=img.dtype)
-        mask[:,7::8,:] = 128
-        mask[:,8::8,:] = 128
-        mask[7::8,:,:] = 128
-        mask[8::8,:,:] = 128
+        mask = np.zeros((h, w, 2), dtype=img.dtype)
+        mask[:,7::8,0] = 128
+        mask[:,8::8,0] = 128
+        mask[7::8,:,0] = 128
+        mask[8::8,:,0] = 128
+        mask[:,15::16,1] = 128
+        mask[:,16::16,1] = 128
+        mask[15::16,:,1] = 128
+        mask[16::16,:,1] = 128
         return np.concatenate((img,mask), axis=2)
 
 

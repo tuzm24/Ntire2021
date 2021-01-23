@@ -154,7 +154,7 @@ class _NetG(nn.Module):
         super(_NetG, self).__init__()
 
         if args.jpeg_grid_add:
-            input_channel = 4
+            input_channel = args.jpeg_grid_add
         else:
             input_channel = 3
         self.conv_input = nn.Conv2d(in_channels=input_channel, out_channels=256, kernel_size=3, stride=1, padding=1, bias=False)
