@@ -44,7 +44,7 @@ class Data:
             self.loader_test.append(
                 dataloader.DataLoader(
                     testset,
-                    batch_size=args.n_GPUs,
+                    batch_size=1,
                     shuffle=False,
                     pin_memory=not args.cpu,
                     num_workers=args.n_threads,

@@ -7,8 +7,10 @@ import loss
 from option import args
 from trainer import Trainer
 
-torch.manual_seed(args.seed)
-checkpoint = utility.checkpoint(args)
+if __name__ == '__main__':
+    utility.checkpoint.GCExperience()
+    torch.manual_seed(args.seed)
+    checkpoint = utility.checkpoint(args)
 
 def main():
     global model
@@ -29,5 +31,4 @@ def main():
             checkpoint.done()
 
 if __name__ == '__main__':
-    utility.checkpoint.GCExperience()
     main()

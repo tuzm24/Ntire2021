@@ -6,6 +6,7 @@ from multiprocessing import Process
 from multiprocessing import Queue
 
 import matplotlib
+
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
@@ -18,6 +19,7 @@ import torch.optim.lr_scheduler as lrs
 import pandas as pd
 from help_func import myUtil
 import shutil
+
 
 class timer():
     def __init__(self):
@@ -44,6 +46,7 @@ class timer():
     def reset(self):
         self.acc = 0
 
+
 class checkpoint():
     def __init__(self, args):
         self.args = args
@@ -52,8 +55,10 @@ class checkpoint():
         now = datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
 
         self.now = now
-        self.dfcol = ['date', 'model_name', 'lr', 'batch_size', 'training_data', 'patch_size','epochs','base_psnr', 'best_psnr', 'latest_psnr']
-        args.save = args.model + '_' + os.path.basename(args.dir_data) + '_(' + str(args.lr) + '_' + str(args.batch_size) + ')_' +now
+        self.dfcol = ['date', 'model_name', 'lr', 'batch_size', 'training_data', 'patch_size', 'epochs', 'base_psnr',
+                      'best_psnr', 'latest_psnr']
+        args.save = args.model + '_' + os.path.basename(args.dir_data) + '_(' + str(args.lr) + '_' + str(
+            args.batch_size) + ')_' + now
         self.name = args.save
         self.df = self.initCSVFile()
         if not args.load:
@@ -78,7 +83,7 @@ class checkpoint():
         for d in args.data_test:
             os.makedirs(self.get_path('results-{}'.format(d)), exist_ok=True)
 
-        open_type = 'a' if os.path.exists(self.get_path('log.txt'))else 'w'
+        open_type = 'a' if os.path.exists(self.get_path('log.txt')) else 'w'
         self.log_file = open(self.get_path('log.txt'), open_type)
         with open(self.get_path('config.txt'), open_type) as f:
             f.write(now + '\n\n')
@@ -107,20 +112,19 @@ class checkpoint():
             df = pd.read_csv(filename, index_col=0)
         return df
 
-    def writeCSVFile(self, best,latest, anc, epoch):
+    def writeCSVFile(self, best, latest, anc, epoch):
         data = {'date': str(self.now),
                 'model_name': str(self.args.model),
                 'lr': str(self.args.lr),
-                'batch_size':str(self.args.batch_size),
+                'batch_size': str(self.args.batch_size),
                 'training_data': str(self.args.dir_data),
                 'patch_size': str(self.args.patch_size),
-                'epochs' : str(int(epoch)),
+                'epochs': str(int(epoch)),
                 'base_psnr': str(float(anc)),
                 'best_psnr': str(float(best)),
-                'latest_psnr':str(float(latest))}
+                'latest_psnr': str(float(latest))}
         self.df.loc[self.name] = data
         self.df.to_csv('./result.csv')
-
 
     def get_path(self, *subdir):
         return os.path.join(self.dir, *subdir)
@@ -176,12 +180,12 @@ class checkpoint():
                     filename, tensor = queue.get()
                     if filename is None: break
                     imageio.imwrite(filename, tensor.numpy())
-        
+
         self.process = [
             Process(target=bg_target, args=(self.queue,)) \
             for _ in range(self.n_processes)
         ]
-        
+
         for p in self.process: p.start()
 
     def end_background(self):
@@ -202,9 +206,11 @@ class checkpoint():
                 tensor_cpu = normalized.byte().permute(1, 2, 0).cpu()
                 self.queue.put(('{}{}.png'.format(filename, p), tensor_cpu))
 
+
 def quantize(img, rgb_range):
     pixel_range = 255 / rgb_range
     return img.mul(pixel_range).clamp(0, 255).round().div(pixel_range)
+
 
 def calc_psnr(sr, hr, scale, rgb_range, dataset=None):
     if hr.nelement() == 1: return 0
@@ -224,10 +230,12 @@ def calc_psnr(sr, hr, scale, rgb_range, dataset=None):
 
     return -10 * math.log10(mse)
 
+
 def make_optimizer(args, target):
     '''
         make optimizer and scheduler together
     '''
+
     # optimizer
 
     class LearningRateWarmUP(object):
@@ -248,16 +256,14 @@ def make_optimizer(args, target):
                 self.warmup_learning_rate(self.last_epoch)
             else:
                 self.after_scheduler.step(self.last_epoch - self.warmup_iteration)
-            self.last_epoch +=1
+            self.last_epoch += 1
 
         def get_lr(self):
-            if self.last_epoch< (self.warmup_iteration + 1):
+            if self.last_epoch < (self.warmup_iteration + 1):
                 return [self.target_lr * float(self.last_epoch + 1) / float(self.warmup_iteration)]
             return self.after_scheduler.get_lr()
 
     trainable = filter(lambda x: x.requires_grad, target.parameters())
-
-
 
     kwargs_optimizer = {'lr': args.lr, 'weight_decay': args.weight_decay}
 
@@ -276,8 +282,8 @@ def make_optimizer(args, target):
 
     milestones = list(map(lambda x: int(x), args.decay.split('-')))
     kwargs_scheduler = {'milestones': milestones, 'gamma': args.gamma}
-    if args.lr_cosine:
-        scheduler_class = lrs.CosineAnnealingLR
+    if args.lr_warm_up:
+        scheduler_class = LearningRateWarmUP
     else:
         scheduler_class = lrs.MultiStepLR
 
@@ -307,12 +313,12 @@ def make_optimizer(args, target):
 
         def get_last_epoch(self):
             return self.scheduler.last_epoch
-    
+
     optimizer = CustomOptimizer(trainable, **kwargs_optimizer)
 
     if args.lr_cosine:
-        kwargs_scheduler =  {'warmup_iteration': args.lr_cosine, 'target_lr': args.lr,
-                        'after_scheduler': torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, args.epochs)}
+        kwargs_scheduler = {'warmup_iteration': args.lr_warm_up, 'target_lr': args.lr,
+                            'after_scheduler': torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, args.epochs)}
 
     optimizer._register_scheduler(scheduler_class, **kwargs_scheduler)
     return optimizer
