@@ -106,7 +106,7 @@ class Trainer():
                         _, _, _, h2, w2 = hr.shape
                         lr = lr.view(b*n, c, h, w)
                         hr = hr.view(b*n, c, h2, w2)
-                        lr_list = [lr[i:i+100] for i in range(0, b*n, 100)]
+                        lr_list = [lr[i:i+200] for i in range(0, b*n, 200)]
                         sr_list = []
                         for _lr in lr_list:
                             sr_list.append(self.model(_lr, idx_scale)[:, :, self.args.grid_batch:-self.args.grid_batch,
