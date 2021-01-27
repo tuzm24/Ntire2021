@@ -56,6 +56,9 @@ class Trainer():
             timer_model.tic()
             self.optimizer.zero_grad()
             sr = self.model(lr, 0)
+            if self.args.grid_batch:
+                sr = sr[:, :, self.args.grid_batch:-self.args.grid_batch,
+                             self.args.grid_batch:-self.args.grid_batch]
             loss = self.loss(sr, hr)
             loss.backward()
             if self.args.gclip > 0:
@@ -106,10 +109,11 @@ class Trainer():
                         lr_list = [lr[i:i+100] for i in range(0, b*n, 100)]
                         sr_list = []
                         for _lr in lr_list:
-                            sr_list.append(self.model(_lr, idx_scale))
+                            sr_list.append(self.model(_lr, idx_scale)[:, :, self.args.grid_batch:-self.args.grid_batch,
+                             self.args.grid_batch:-self.args.grid_batch])
                         sr = torch.cat(sr_list, dim=0)
                         lr = lr[:, :, self.args.grid_batch:-self.args.grid_batch,
-                             self.args.grid_batch:self.args.grid_batch]
+                             self.args.grid_batch:-self.args.grid_batch]
                     else:
                         if self.args.jpeg_yuv_domain:
                             lr[:,:3,...] = rgb_to_ycbcr(lr[:,:3,...])

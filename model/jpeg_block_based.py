@@ -152,14 +152,13 @@ class Recon_Block(nn.Module):
 class _NetG(nn.Module):
     def __init__(self, args):
         super(_NetG, self).__init__()
-        self.args = args
         if args.jpeg_grid_add:
             input_channel = args.jpeg_grid_add
         else:
             input_channel = 3
         self.conv_input = nn.Conv2d(in_channels=input_channel, out_channels=256, kernel_size=3, stride=1, padding=1, bias=False)
         self.relu1 = nn.PReLU()
-        self.conv_down = nn.Conv2d(in_channels=256, out_channels=256, kernel_size=3, stride=3, padding=1, bias=False)
+        self.conv_down = nn.Conv2d(in_channels=256, out_channels=256, kernel_size=3, stride=2, padding=1, bias=False)
         self.relu2 = nn.PReLU()
 
         self.recursive_A = _Residual_Block()
@@ -178,14 +177,14 @@ class _NetG(nn.Module):
         self.conv_mid2 = nn.Conv2d(in_channels=256, out_channels=256, kernel_size=3, stride=1, padding=1, bias=False)
         self.relu4 = nn.PReLU()
 
-        # self.subpixel = nn.PixelShuffle(2)
-        self.conv_output = nn.Conv2d(in_channels=256, out_channels=3, kernel_size=3, stride=1, padding=1, bias=False)
+        self.subpixel = nn.PixelShuffle(2)
+        self.conv_output = nn.Conv2d(in_channels=64, out_channels=3, kernel_size=3, stride=1, padding=1, bias=False)
 
 
 
 
     def forward(self, x):
-        residual = x[:,:3,self.args.grid_batch:-self.args.grid_batch,self.args.grid_batch:-self.args.grid_batch]
+        residual = x[:,:3,...]
         out = self.relu1(self.conv_input(x))
         out = self.relu2(self.conv_down(out))
 
@@ -210,7 +209,7 @@ class _NetG(nn.Module):
         out = self.relu4(self.conv_mid2(out))
         out = torch.add(out, residual2)
 
-        # out= self.subpixel(out)
+        out= self.subpixel(out)
         out = self.conv_output(out)
         out = torch.add(out, residual)
 
