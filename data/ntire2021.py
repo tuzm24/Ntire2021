@@ -53,7 +53,7 @@ class Ntire2021(srdata.SRData):
             self.dir_lr = myUtil.filteringPath(dirs, 'train_blur')
         if not self.train or self.dir_hr is None:
             self.dir_hr = myUtil.filteringPath(dirs, 'val_sharp')
-            self.dir_lr = myUtil.filteringPath(dirs, 'val_sharp')
+            self.dir_lr = myUtil.filteringPath(dirs, 'train_blur')
         if '_jpeg' in os.path.basename(self.dir_lr):
             self.ext = ('.png', '.jpg')
         else:
