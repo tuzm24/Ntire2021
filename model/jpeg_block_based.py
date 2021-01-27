@@ -185,7 +185,7 @@ class _NetG(nn.Module):
 
 
     def forward(self, x):
-        residual = x[:,:3,self.args.jpeg_grid_add:-self.args_grid_Add,self.args.jpeg_grid_add:-self.args_grid_Add]
+        residual = x[:,:3,self.args.grid_batch:-self.args.grid_batch,self.args.grid_batch:-self.args.grid_batch]
         out = self.relu1(self.conv_input(x))
         out = self.relu2(self.conv_down(out))
 
