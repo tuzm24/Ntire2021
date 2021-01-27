@@ -16,6 +16,8 @@ import torch
 import torch.optim as optim
 import torch.optim.lr_scheduler as lrs
 import pandas as pd
+from help_func import myUtil
+import shutil
 
 class timer():
     def __init__(self):
@@ -86,8 +88,19 @@ class checkpoint():
 
         self.n_processes = 8
 
+    @staticmethod
+    def GCExperience():
+        dir_list = myUtil.getDirlist(os.path.join('..', 'experiment'))
+        for dir in dir_list:
+            try:
+                if not os.listdir(os.path.join(dir, 'model')):
+                    shutil.rmtree(dir)
+            except Exception as e:
+                print(e)
+        return
+
     def initCSVFile(self):
-        filename = './result.csv'
+        filename = os.path.join('..', 'experiment', './result.csv')
         if not os.path.exists(filename):
             df = pd.DataFrame(columns=self.dfcol)
         else:
@@ -206,8 +219,8 @@ def calc_psnr(sr, hr, scale, rgb_range, dataset=None):
     else:
         shave = scale + 6
 
-    valid = diff[..., shave:-shave, shave:-shave]
-    mse = valid.pow(2).mean()
+    # valid = diff[..., shave:-shave, shave:-shave]
+    mse = diff.pow(2).mean()
 
     return -10 * math.log10(mse)
 
@@ -257,7 +270,7 @@ def make_optimizer(args, target):
             self.scheduler.step()
 
         def get_lr(self):
-            return self.scheduler.get_last_lr()[0]
+            return self.scheduler.get_lr()[0]
 
         def get_last_epoch(self):
             return self.scheduler.last_epoch

@@ -33,6 +33,8 @@ parser.add_argument('--jpeg_grid_add', type=int, default=0,
                     help='jpeg 8x8 grid add')
 parser.add_argument('--jpeg_yuv_domain', action='store_true',
                     help='jpeg yuv domain')
+parser.add_argument('--grid_batch', type=int, default=0,
+                    help='jpeg grid batch')
 
 parser.add_argument('--data_train', type=str, default='Ntire2021',
                     help='train dataset name')

@@ -91,6 +91,11 @@ class Trainer():
                 d.dataset.set_scale(idx_scale)
                 for lr, hr, filename in tqdm(d, ncols=80):
                     lr, hr = self.prepare(lr, hr)
+                    if self.args.grid_batch:
+                        b, n, c, h, w = lr.shape
+                        _, _, _, h2, w2 = hr.shape
+                        lr = lr.view(b*n, c, h, w)
+                        hr = hr.view(b*n, c, h2, w2)
                     lr_tmp = torch.clone(lr[:,:3,...])
                     if self.args.jpeg_yuv_domain:
                         lr[:,:3,...] = rgb_to_ycbcr(lr[:,:3,...])
@@ -115,6 +120,8 @@ class Trainer():
                     )
                     if self.args.save_results:
                         self.ckp.save_results(d, filename[0], save_list, scale)
+                    del lr_tmp, lr, hr
+                    torch.cuda.empty_cache()
 
                 self.ckp.log[-1, idx_data, idx_scale] /= len(d)
                 self.ckp.log[-1, idx_data, -1] /= len(d)

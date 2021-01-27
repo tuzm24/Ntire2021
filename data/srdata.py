@@ -93,20 +93,31 @@ class SRData(data.Dataset):
 
     def getJPEGGrid(self, img):
         h, w, _ = img.shape
-        mask = np.zeros((h, w, 2), dtype=img.dtype)
-        mask[:,7::8,0] = 128
-        mask[:,8::8,0] = 128
-        mask[7::8,:,0] = 128
-        mask[8::8,:,0] = 128
-        mask[:,15::16,1] = 128
-        mask[:,16::16,1] = 128
-        mask[15::16,:,1] = 128
-        mask[16::16,:,1] = 128
+        if self.args.jpeg_grid_add ==5:
+            mask = np.zeros((h, w, 2), dtype=img.dtype)
+            mask[:,7::8,0] = 128
+            mask[:,8::8,0] = 128
+            mask[7::8,:,0] = 128
+            mask[8::8,:,0] = 128
+            mask[:,15::16,1] = 128
+            mask[:,16::16,1] = 128
+            mask[15::16,:,1] = 128
+            mask[16::16,:,1] = 128
+        elif self.args.jpeg_grid_add == 4:
+            mask = np.zeros((h, w, 1), dtype=img.dtype)
+            mask[:,7::8,0] = 128
+            mask[:,8::8,0] = 128
+            mask[7::8,:,0] = 128
+            mask[8::8,:,0] = 128
         return np.concatenate((img,mask), axis=2)
 
 
     def __getitem__(self, idx):
         lr, hr, filename = self._load_file(idx)
+        if self.args.grid_batch:
+            pair_t = self.get_patch_grid_batch(lr, hr)
+            return pair_t[0], pair_t[1], filename
+
         if self.args.jpeg_grid_add:
             lr=self.getJPEGGrid(lr)
         pair = self.get_patch(lr, hr)
@@ -160,6 +171,33 @@ class SRData(data.Dataset):
             hr = hr[0:ih * scale, 0:iw * scale]
 
         return lr, hr
+
+    def get_patch_grid_batch(self, lr, hr):
+        def _np2Tensor(img, transpose=(2, 0, 1)):
+            np_transpose = np.ascontiguousarray(img.transpose(transpose))
+            tensor = torch.from_numpy(np_transpose).float()
+            tensor.mul_(self.args.rgb_range / 255)
+
+            return tensor
+
+        pad = self.args.grid_batch
+        patch_size = self.args.patch_size
+        ih, iw = lr.shape[:2]
+        lr = np.pad(lr, ((pad, pad), (pad, pad), (0,0)), 'edge')
+        if self.train:
+            ix = random.randrange(0, iw - patch_size + 1, 8)
+            iy = random.randrange(0, ih - patch_size + 1, 8)
+            lr = lr[iy:iy + patch_size + pad + pad, ix: ix + patch_size + pad + pad, :]
+            hr = hr[iy:iy + patch_size, ix:ix + patch_size, :]
+            return [_np2Tensor(lr), _np2Tensor(hr)]
+        else:
+            lr = np.stack([lr[iy:iy + patch_size + pad + pad, ix: ix + patch_size + pad + pad, :]
+                       for iy in range(0, ih, patch_size) for ix in range(0, iw, patch_size)], axis=0)
+            hr = np.stack([hr[iy:iy + patch_size, ix:ix + patch_size, :]
+                       for iy in range(0, ih, patch_size) for ix in range(0, iw, patch_size)], axis=0)
+            return [_np2Tensor(lr, (0,3,1,2)), _np2Tensor(hr, (0,3,1,2))]
+
+
 
     def set_scale(self, idx_scale):
         if not self.input_large:

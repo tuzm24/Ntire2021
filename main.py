@@ -26,8 +26,8 @@ def main():
             while not t.terminate():
                 t.train()
                 t.test()
-
             checkpoint.done()
 
 if __name__ == '__main__':
+    utility.checkpoint.GCExperience()
     main()
