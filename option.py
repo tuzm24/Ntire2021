@@ -35,6 +35,10 @@ parser.add_argument('--jpeg_yuv_domain', action='store_true',
                     help='jpeg yuv domain')
 parser.add_argument('--grid_batch', type=int, default=0,
                     help='jpeg grid batch')
+parser.add_argument('--lr_warm_up', type=int, default=0,
+                    help='use learning rate warmup during integer epoch')
+parser.add_argument('--lr_cosine', action='store_true',
+                    help='use cosine annealing lreaning rate')
 
 parser.add_argument('--data_train', type=str, default='Ntire2021',
                     help='train dataset name')

@@ -229,7 +229,36 @@ def make_optimizer(args, target):
         make optimizer and scheduler together
     '''
     # optimizer
+
+    class LearningRateWarmUP(object):
+        def __init__(self, optimizer, warmup_iteration, target_lr, after_scheduler=None):
+            self.optimizer = optimizer
+            self.warmup_iteration = warmup_iteration
+            self.target_lr = target_lr
+            self.after_scheduler = after_scheduler
+            self.last_epoch = 0
+
+        def warmup_learning_rate(self, cur_iteration):
+            warmup_lr = self.target_lr * float(cur_iteration + 1) / float(self.warmup_iteration)
+            for param_group in self.optimizer.param_groups:
+                param_group['lr'] = warmup_lr
+
+        def step(self):
+            if self.last_epoch < (self.warmup_iteration + 1):
+                self.warmup_learning_rate(self.last_epoch)
+            else:
+                self.after_scheduler.step(self.last_epoch - self.warmup_iteration)
+            self.last_epoch +=1
+
+        def get_lr(self):
+            if self.last_epoch< (self.warmup_iteration + 1):
+                return [self.target_lr * float(self.last_epoch + 1) / float(self.warmup_iteration)]
+            return self.after_scheduler.get_lr()
+
     trainable = filter(lambda x: x.requires_grad, target.parameters())
+
+
+
     kwargs_optimizer = {'lr': args.lr, 'weight_decay': args.weight_decay}
 
     if args.optimizer == 'SGD':
@@ -244,9 +273,13 @@ def make_optimizer(args, target):
         kwargs_optimizer['eps'] = args.epsilon
 
     # scheduler
+
     milestones = list(map(lambda x: int(x), args.decay.split('-')))
     kwargs_scheduler = {'milestones': milestones, 'gamma': args.gamma}
-    scheduler_class = lrs.MultiStepLR
+    if args.lr_cosine:
+        scheduler_class = lrs.CosineAnnealingLR
+    else:
+        scheduler_class = lrs.MultiStepLR
 
     class CustomOptimizer(optimizer_class):
         def __init__(self, *args, **kwargs):
@@ -276,6 +309,11 @@ def make_optimizer(args, target):
             return self.scheduler.last_epoch
     
     optimizer = CustomOptimizer(trainable, **kwargs_optimizer)
+
+    if args.lr_cosine:
+        kwargs_scheduler =  {'warmup_iteration': args.lr_cosine, 'target_lr': args.lr,
+                        'after_scheduler': torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, args.epochs)}
+
     optimizer._register_scheduler(scheduler_class, **kwargs_scheduler)
     return optimizer
 
