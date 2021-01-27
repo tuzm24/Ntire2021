@@ -103,14 +103,20 @@ class Trainer():
                         _, _, _, h2, w2 = hr.shape
                         lr = lr.view(b*n, c, h, w)
                         hr = hr.view(b*n, c, h2, w2)
-                    lr_tmp = torch.clone(lr[:,:3,...])
-                    if self.args.jpeg_yuv_domain:
-                        lr[:,:3,...] = rgb_to_ycbcr(lr[:,:3,...])
-                    sr = self.model(lr, idx_scale)
+                        lr_list = [lr[i:i+100] for i in range(0, b, 100)]
+                        sr_list = []
+                        for _lr in lr_list:
+                            sr_list.append(self.model(_lr, idx_scale))
+                        sr = torch.cat(sr_list, dim=0)
+                    else:
+                        if self.args.jpeg_yuv_domain:
+                            lr[:,:3,...] = rgb_to_ycbcr(lr[:,:3,...])
+
+                        sr = self.model(lr, idx_scale)
+
                     if self.args.jpeg_yuv_domain:
                         sr[:,:3,...] = ycbcr_to_rgb(sr[:,:3,...])
-                    if self.args.jpeg_grid_add or self.args.jpeg_yuv_domain:
-                        lr = lr_tmp
+                        lr = rgb_to_ycbcr(lr[:,:3,...])
                     sr = utility.quantize(sr, self.args.rgb_range)
 
                     save_list = [sr]
@@ -127,8 +133,6 @@ class Trainer():
                     )
                     if self.args.save_results:
                         self.ckp.save_results(d, filename[0], save_list, scale)
-                    del lr_tmp, lr, hr
-                    torch.cuda.empty_cache()
 
                 self.ckp.log[-1, idx_data, idx_scale] /= len(d)
                 self.ckp.log[-1, idx_data, -1] /= len(d)

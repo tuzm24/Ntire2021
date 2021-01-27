@@ -33,7 +33,8 @@ class Ntire2021(srdata.SRData):
                     filename, self.ext[1]
                 )
             ))
-        if not self.train and not self.args.test_only:
+        # if not self.train and not self.args.test_only:
+        if not self.train:
             stride = len(names_hr)//self.args.valid_num
             names_hr = names_hr[::stride]
             names_lr = [n[::stride] for n in names_lr]
@@ -53,7 +54,7 @@ class Ntire2021(srdata.SRData):
             self.dir_lr = myUtil.filteringPath(dirs, 'train_blur')
         if not self.train or self.dir_hr is None:
             self.dir_hr = myUtil.filteringPath(dirs, 'val_sharp')
-            self.dir_lr = myUtil.filteringPath(dirs, 'train_blur')
+            self.dir_lr = myUtil.filteringPath(dirs, 'val_blur')
         if '_jpeg' in os.path.basename(self.dir_lr):
             self.ext = ('.png', '.jpg')
         else:

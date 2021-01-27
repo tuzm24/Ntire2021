@@ -9,8 +9,8 @@ from trainer import Trainer
 
 if __name__ == '__main__':
     utility.checkpoint.GCExperience()
-    torch.manual_seed(args.seed)
     checkpoint = utility.checkpoint(args)
+torch.manual_seed(args.seed)
 
 def main():
     global model
