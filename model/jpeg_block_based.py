@@ -179,7 +179,7 @@ class _NetG(nn.Module):
         self.relu4 = nn.PReLU()
 
         # self.subpixel = nn.PixelShuffle(2)
-        self.conv_output = nn.Conv2d(in_channels=64, out_channels=3, kernel_size=3, stride=1, padding=1, bias=False)
+        self.conv_output = nn.Conv2d(in_channels=256, out_channels=3, kernel_size=3, stride=1, padding=1, bias=False)
 
 
 
@@ -210,7 +210,7 @@ class _NetG(nn.Module):
         out = self.relu4(self.conv_mid2(out))
         out = torch.add(out, residual2)
 
-        out= self.subpixel(out)
+        # out= self.subpixel(out)
         out = self.conv_output(out)
         out = torch.add(out, residual)
 

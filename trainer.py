@@ -42,6 +42,11 @@ class Trainer():
         self.loader_train.dataset.set_scale(0)
         for batch, (lr, hr, _,) in enumerate(self.loader_train):
             lr, hr = self.prepare(lr, hr)
+            if self.args.grid_batch:
+                b, n, c, h, w = lr.shape
+                _, _, _, h2, w2 = hr.shape
+                lr = lr.view(b * n, c, h, w)
+                hr = hr.view(b * n, c, h2, w2)
             if self.args.jpeg_yuv_domain:
                 hr = rgb_to_ycbcr(hr)
                 lr[:,:3,...] = rgb_to_ycbcr(lr[:,:3,...])

@@ -173,7 +173,7 @@ class SRData(data.Dataset):
         return lr, hr
 
     def get_patch_grid_batch(self, lr, hr):
-        def _np2Tensor(img, transpose=(2, 0, 1)):
+        def _np2Tensor(img, transpose=(0,3,1,2)):
             np_transpose = np.ascontiguousarray(img.transpose(transpose))
             tensor = torch.from_numpy(np_transpose).float()
             tensor.mul_(self.args.rgb_range / 255)
@@ -185,10 +185,15 @@ class SRData(data.Dataset):
         ih, iw = lr.shape[:2]
         lr = np.pad(lr, ((pad, pad), (pad, pad), (0,0)), 'edge')
         if self.train:
-            ix = random.randrange(0, iw - patch_size + 1, 8)
-            iy = random.randrange(0, ih - patch_size + 1, 8)
-            lr = lr[iy:iy + patch_size + pad + pad, ix: ix + patch_size + pad + pad, :]
-            hr = hr[iy:iy + patch_size, ix:ix + patch_size, :]
+            lr_list = []
+            hr_list = []
+            for i in range(36):
+                ix = random.randrange(0, iw - patch_size + 1, 16)
+                iy = random.randrange(0, ih - patch_size + 1, 16)
+                lr_list.append(lr[iy:iy + patch_size + pad + pad, ix: ix + patch_size + pad + pad, :])
+                hr_list.append(hr[iy:iy + patch_size, ix:ix + patch_size, :])
+            lr = np.stack(lr_list, axis = 0)
+            hr = np.stack(hr_list, axis = 0)
             return [_np2Tensor(lr), _np2Tensor(hr)]
         else:
             lr = np.stack([lr[iy:iy + patch_size + pad + pad, ix: ix + patch_size + pad + pad, :]
