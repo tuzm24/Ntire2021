@@ -9,10 +9,10 @@ class Ntire2021(srdata.SRData):
         if train:
             data_range = data_range[0]
         else:
-            if args.test_only and len(data_range) == 1:
-                data_range = data_range[0]
-            else:
-                data_range = data_range[1]
+            # if args.test_only and len(data_range) == 1:
+            #     data_range = data_range[0]
+            # else:
+            data_range = data_range[1]
 
         self.begin, self.end = list(map(lambda x: int(x), data_range))
         super(Ntire2021, self).__init__(
