@@ -29,7 +29,7 @@ class BridgeBlock(nn.Module):
 
 
 class GroupDesnseUnet(nn.Module):
-    def __init__(self, nChannels=256, nDenselayers=8, growRate=64, nDenseBlocks=e):
+    def __init__(self, nChannels=256, nDenselayers=8, growRate=64, nDenseBlocks=0):
         super(GroupDesnseUnet, self).__init__()
 
         self.grdb1 = GRDB(numofkernels=nChannels, nDenselayer=nDenselayers, growthRate=growRate, numforrg=nDenseBlocks)
