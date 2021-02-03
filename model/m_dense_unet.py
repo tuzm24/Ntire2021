@@ -3,6 +3,8 @@ import torch.nn as nn
 import math
 import torch.nn.functional as F
 
+def make_model(args, parent=False):
+    return MegaDenseUnet(args)
 
 class make_dense(nn.Module):
     def __init__(self, nChannels, nChannels_, growthRate, kernel_size=3):
