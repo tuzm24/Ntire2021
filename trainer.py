@@ -9,7 +9,7 @@ import torch.nn.utils as utils
 from tqdm import tqdm
 from help_torch import rgb_to_ycbcr
 from help_torch import ycbcr_to_rgb
-import numpy as np
+
 
 
 class Trainer():
@@ -179,16 +179,11 @@ class Trainer():
 
                     save_list = [sr]
 
-                    perlist.append(float(((sr - hr) / self.args.rgb_range).pow(2).mean()))
-                    print(utility.calc_psnr(
-                        lr, hr, scale, self.args.rgb_range, dataset=d
-                    ), utility.calc_psnr(
-                        sr, hr, scale, self.args.rgb_range, dataset=d
-                    ), filename, perlist[-1])
                     self.ckp.log[-1, idx_data, idx_scale] += utility.calc_psnr(
                         sr, hr, scale, self.args.rgb_range, dataset=d
                     )
-
+                    if lr.size(1)>3:
+                        lr = lr[:3]
                     if self.args.save_gt:
                         save_list.extend([lr, hr])
                     if self.args.scale[idx_scale]>1:
@@ -215,9 +210,7 @@ class Trainer():
 
                 self.ckp.writeCSVFile(best[0][idx_data, idx_scale], self.ckp.log[-1, idx_data, idx_scale],
                                       best[0][idx_data, -1], best[1][idx_data, idx_scale] + 1)
-        loss_list = np.percentile(np.array(perlist), [0, 20, 40, 60, 80, 100], interpolation='nearest')
-        for p in loss_list:
-            print(p, -10 * math.log10(p))
+
         self.ckp.write_log('Forward: {:.2f}s\n'.format(timer_test.toc()))
         self.ckp.write_log('Saving...')
         if self.args.save_results:
