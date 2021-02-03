@@ -183,7 +183,7 @@ class Trainer():
                         sr, hr, scale, self.args.rgb_range, dataset=d
                     )
                     if lr.size(1)>3:
-                        lr = lr[:3]
+                        lr = lr[:,:3,...]
                     if self.args.save_gt:
                         save_list.extend([lr, hr])
                     if self.args.scale[idx_scale]>1:
