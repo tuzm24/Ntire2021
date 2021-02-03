@@ -40,6 +40,7 @@ class Ntire2021(srdata.SRData):
             names_hr = names_hr[start::stride]
             names_lr = [n[start::stride] for n in names_lr]
         elif not self.train:
+            start = 9
             stride = len(names_hr)//self.args.valid_num
             names_hr = names_hr[::stride]
             names_lr = [n[::stride] for n in names_lr]

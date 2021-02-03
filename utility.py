@@ -57,8 +57,7 @@ class checkpoint():
         self.now = now
         self.dfcol = ['date', 'model_name', 'lr', 'batch_size', 'training_data', 'patch_size', 'epochs', 'base_psnr',
                       'best_psnr', 'latest_psnr']
-        args.save = args.model + '_' + os.path.basename(args.dir_data) + '_(' + str(args.lr) + '_' + str(
-            args.batch_size) + ')_' + now
+        args.save = args.model + '_' + os.path.basename(args.dir_data)  + now
         self.name = args.save
         self.df = self.initCSVFile()
         if not args.load:

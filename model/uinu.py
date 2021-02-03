@@ -214,3 +214,17 @@ class _NetG(nn.Module):
         out = torch.add(out, residual)
 
         return out
+
+
+if __name__ == '__main__':
+    from my_torchsummary import summary
+    class temp:
+        def __init__(self):
+            self.jpeg_grid_add = False
+    a = temp()
+    m = _NetG(a).cuda()
+    inpt = torch.randn((2, 3, 96, 96)).cuda()
+    torch.set_grad_enabled(False)
+    m.eval()
+    summary(m, (3, 1280, 720))
+    m(inpt)
