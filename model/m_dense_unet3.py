@@ -219,14 +219,11 @@ class MegaDenseUnet(nn.Module):
                                     nDenseBlocks=self.nDenseBlocks, growRate=self.growRate)
         self.gdu4 = GroupDesnseUnet(nChannels=self.base_channel, nDenselayers=self.nDenselayers,
                                     nDenseBlocks=self.nDenseBlocks, growRate=self.growRate)
-        self.gdu5 = GroupDesnseUnet(nChannels=self.base_channel, nDenselayers=self.nDenselayers,
-                                    nDenseBlocks=self.nDenseBlocks, growRate=self.growRate)
-        self.gdu6 = GroupDesnseUnet(nChannels=self.base_channel, nDenselayers=self.nDenselayers,
-                                    nDenseBlocks=self.nDenseBlocks, growRate=self.growRate)
 
-        self.recon = nn.Conv2d(in_channels=self.base_channel * 6, out_channels=self.base_channel, kernel_size=3, stride=1, padding=1, bias=False)
+
+        self.recon = nn.Conv2d(in_channels=self.base_channel * 4, out_channels=self.base_channel, kernel_size=3, stride=1, padding=1, bias=False)
         self.prelu3 = nn.PReLU()
-        self.gdu7 = GroupDesnseUnet(nChannels=self.base_channel, nDenselayers=self.nDenselayers,
+        self.gdu5 = GroupDesnseUnet(nChannels=self.base_channel, nDenselayers=self.nDenselayers,
                                     nDenseBlocks=self.nDenseBlocks, growRate=self.growRate)
 
         self.subpixel = nn.PixelShuffle(2)
@@ -241,11 +238,9 @@ class MegaDenseUnet(nn.Module):
         x2 = self.gdu2(x)
         x3 = self.gdu3(self.gdce1_1(torch.cat([x, grid8x8], dim=1)))
         x4 = self.gdu4(self.gdce2_1(torch.cat([x, grid16x16], dim=1)))
-        x5 = self.gdu5(x)
-        x6 = self.gdu6(x)
-        x = torch.cat([x1, x2, x3, x4, x5, x6], dim=1)
+        x = torch.cat([x1, x2, x3, x4], dim=1)
         x = self.prelu3(self.recon(x))
-        x = self.gdu7(x)
+        x = self.gdu5(x)
         x = self.subpixel(x)
         return self.finalconv(x) + residual
 
@@ -259,9 +254,9 @@ if __name__ == '__main__':
 
     m = MegaDenseUnet(1).cuda()
 
-    torch.set_grad_enabled(False)
-    m.eval()
-    inpt = torch.randn((1,5,1280,720)).cuda()
-    summary(m, (5, 1280, 720))
+    inpt = torch.randn((1,5,96,96)).cuda()
     while True:
         m(inpt)
+    torch.set_grad_enabled(False)
+    m.eval()
+    summary(m, (5, 1280, 720))
