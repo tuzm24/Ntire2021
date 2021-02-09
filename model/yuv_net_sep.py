@@ -164,14 +164,14 @@ class _NetG(nn.Module):
         self.yconv = nn.Sequential(
             nn.Conv2d(in_channels=2, out_channels=128, kernel_size=3, stride=1, padding=1, bias=False),
             nn.PReLU(),
-            nn.Conv2d(in_channels=128, out_channels=128, kernel_size=3, stride=1, padding=1, bias=False)
+            nn.Conv2d(in_channels=128, out_channels=128, kernel_size=3, stride=2, padding=1, bias=False)
         )
 
         self.ybam = CBAM(128)
         self.cconv = nn.Sequential(
             nn.Conv2d(in_channels=2, out_channels=128, kernel_size=3, stride=1, padding=1, bias=False),
             nn.PReLU(),
-            nn.Conv2d(in_channels=128, out_channels=128, kernel_size=3, stride=1, padding=1, bias=False)
+            nn.Conv2d(in_channels=128, out_channels=128, kernel_size=3, stride=2, padding=1, bias=False)
         )
         self.cbam = CBAM(128)
         self.cdown = nn.Conv2d(in_channels=257, out_channels=256, kernel_size=3, stride=2, padding=1, bias=False)
