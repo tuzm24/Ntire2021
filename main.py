@@ -25,6 +25,9 @@ def main():
             _model = model.Model(args, checkpoint)
             _loss = loss.Loss(args, checkpoint) if not args.test_only else None
             t = Trainer(args, loader, _model, _loss, checkpoint)
+
+            print('Train loader len : ', len(t.loader_train.dataset))
+            print('Test loader len : ', len(t.loader_test[0].dataset))
             while not t.terminate():
                 t.train()
                 t.test()

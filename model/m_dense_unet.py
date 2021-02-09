@@ -246,10 +246,10 @@ if __name__ == '__main__':
     from my_torchsummary import summary
 
     m = MegaDenseUnet(1).cuda()
-    inpt = torch.randn((2,5,96,96)).cuda()
-
-    while True:
-        m(inpt)
+    # inpt = torch.randn((2,5,96,96)).cuda()
+    #
+    # while True:
+    #     m(inpt)
     torch.set_grad_enabled(False)
     m.eval()
     summary(m, (5, 64, 64))

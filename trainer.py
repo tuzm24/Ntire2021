@@ -45,7 +45,6 @@ class Trainer():
         # TEMP
         self.loader_train.dataset.set_scale(0)
 
-        print(len(self.loader_train.dataset))
         for batch, (lr, hr, _,) in enumerate(self.loader_train):
             lr, hr = self.prepare(lr, hr)
             if self.args.grid_batch:

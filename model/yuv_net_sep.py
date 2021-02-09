@@ -2,16 +2,16 @@ import torch
 import torch.nn as nn
 from help_torch import RgbToYcbcr
 from help_torch import YcbcrToRgb
-
+from model.cbam import CBAM
 def make_model(args, parent=False):
     return _NetG(args)
 
 class _Residual_Block(nn.Module):
-    def __init__(self):
+    def __init__(self, input_dim=256):
         super(_Residual_Block, self).__init__()
 
         #res1
-        self.conv1 = nn.Conv2d(in_channels=256, out_channels=256, kernel_size=3, stride=1, padding=1, bias=False)
+        self.conv1 = nn.Conv2d(in_channels=input_dim, out_channels=256, kernel_size=3, stride=1, padding=1, bias=False)
         self.relu2 = nn.PReLU()
         self.conv3 = nn.Conv2d(in_channels=256, out_channels=256, kernel_size=3, stride=1, padding=1, bias=False)
         self.relu4 = nn.PReLU()
@@ -159,26 +159,64 @@ class _NetG(nn.Module):
         else:
             input_channel = 3
         self.rgb_to_yuv = RgbToYcbcr()
-        self.conv_input = nn.Conv2d(in_channels=input_channel, out_channels=256, kernel_size=3, stride=1, padding=1, bias=False)
-        self.relu1 = nn.PReLU()
-        self.conv_down = nn.Conv2d(in_channels=256, out_channels=256, kernel_size=3, stride=2, padding=1, bias=False)
-        self.relu2 = nn.PReLU()
 
-        self.recursive_A = _Residual_Block()
+
+        self.yconv = nn.Sequential(
+            nn.Conv2d(in_channels=2, out_channels=128, kernel_size=3, stride=1, padding=1, bias=False),
+            nn.PReLU(),
+            nn.Conv2d(in_channels=128, out_channels=128, kernel_size=3, stride=1, padding=1, bias=False)
+        )
+
+        self.ybam = CBAM(128)
+        self.cconv = nn.Sequential(
+            nn.Conv2d(in_channels=2, out_channels=128, kernel_size=3, stride=1, padding=1, bias=False),
+            nn.PReLU(),
+            nn.Conv2d(in_channels=128, out_channels=128, kernel_size=3, stride=1, padding=1, bias=False)
+        )
+        self.cbam = CBAM(128)
+        self.cdown = nn.Conv2d(in_channels=257, out_channels=256, kernel_size=3, stride=2, padding=1, bias=False)
+
+
+
+        self.recursive_A = _Residual_Block(input_dim=257)
         self.recursive_B = _Residual_Block()
         self.recursive_C = _Residual_Block()
         self.recursive_D = _Residual_Block()
-        self.recursive_E = _Residual_Block()
+        self.recursive_E = _Residual_Block(input_dim=257)
         self.recursive_F = _Residual_Block()
 
 
-        self.recon = Recon_Block()
+        self.yrecon = Recon_Block()
+        self.crecon = Recon_Block()
         #concat
 
+        self.y_mid = nn.Sequential(
+            nn.Conv2d(in_channels=256*4, out_channels=256, kernel_size=1, stride=1, padding=0, bias=False),
+            nn.PReLU()
+        )
+        self.y_mid2 = nn.Sequential(
+            nn.Conv2d(in_channels=256, out_channels=256, kernel_size=3, stride=1, padding=1, bias=False),
+            nn.PReLU()
+        )
+        self.c_mid = nn.Sequential(
+            nn.Conv2d(in_channels=256*2, out_channels=256, kernel_size=1, stride=1, padding=0, bias=False),
+            nn.PReLU()
+        )
+        self.c_mid2 = nn.Sequential(
+            nn.Conv2d(in_channels=256, out_channels=256, kernel_size=3, stride=1, padding=1, bias=False),
+            nn.PReLU()
+        )
 
 
-        self.subpixel = nn.PixelShuffle(2)
-        self.conv_output = nn.Conv2d(in_channels=64, out_channels=3, kernel_size=3, stride=1, padding=1, bias=False)
+
+        self.yconv_output = nn.Sequential(nn.PixelShuffle(2),
+                                          nn.Conv2d(in_channels=64, out_channels=1, kernel_size=3, stride=1, padding=1, bias=False))
+        self.cconv_output = nn.Sequential(nn.PixelShuffle(2),
+                                          nn.Conv2d(in_channels=64, out_channels=3, kernel_size=3, stride=1, padding=1, bias=False),
+                                          nn.PixelShuffle(2),
+                                          nn.Conv2d(in_channels=16, out_channels=2, kernel_size=3, stride=1, padding=1,
+                                                    bias=False)
+        )
         self.yuv_to_rgb = YcbcrToRgb()
 
 
@@ -186,19 +224,21 @@ class _NetG(nn.Module):
 
     def forward(self, x):
         yuv_input = self.rgb_to_yuv(x[:,:3,...])
+        grid = x[:,3:,...]
         residual = yuv_input
-        if self.isjpg:
-            _input = torch.cat([yuv_input, x[:,3:,...]], dim=1)
-        else:
-            _input = yuv_input
-        out = self.relu1(self.conv_input(_input))
-        out = self.relu2(self.conv_down(out))
+        y_out = self.yconv(torch.cat([yuv_input[:,:1,...], grid], dim=1))
+        c_out = self.cconv(yuv_input[:,1:3,...])
 
-        out1 = self.recursive_A(out)
+        y_out = torch.cat([y_out, self.cbam(c_out)], dim=1)
+        c_out = torch.cat([c_out, self.ybam(y_out), grid], dim=1)
+        c_out = torch.cat([self.cdown(c_out)], dim=1)
+
+
+        out1 = self.recursive_A(y_out)
         out2 = self.recursive_B(out1)
         out3 = self.recursive_C(out2)
         out4 = self.recursive_D(out3)
-        out5 = self.recursive_E(out4)
+        out5 = self.recursive_E(c_out)
         out6 = self.recursive_F(out5)
 
         recon1 = self.recon(out1)
@@ -208,16 +248,23 @@ class _NetG(nn.Module):
         recon5 = self.recon(out5)
         recon6 = self.recon(out6)
 
-        out = torch.cat([recon1, recon2, recon3, recon4, recon5, recon6], 1)
+        y_out = torch.cat([recon1, recon2, recon3, recon4], 1)
+        c_out = torch.cat([recon5, recon6], 1)
 
-        out = self.relu3(self.conv_mid(out))
-        residual2 = out
-        out = self.relu4(self.conv_mid2(out))
-        out = torch.add(out, residual2)
 
-        out= self.subpixel(out)
-        out = self.conv_output(out)
-        out = torch.add(out, residual)
+        y_out = self.y_mid(y_out)
+        y_res = y_out
+        y_out = self.y_mid2(y_out)
+        y_out = torch.add(y_out, y_res)
+        y_out = torch.add(self.yconv_output(y_out), residual[:,:1,...])
 
-        out = self.yuv_to_rgb(out)
+        c_out = self.c_mid(c_out)
+        c_res = c_out
+        c_out = self.c_mid2(c_out)
+        c_out = torch.add(c_out, c_res)
+        c_out = torch.add(self.cconv_output(c_out), residual[:,1:3,...])
+
+
+
+        out = self.yuv_to_rgb(torch.cat([y_out,c_out], dim=1))
         return out

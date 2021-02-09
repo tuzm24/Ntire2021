@@ -254,9 +254,9 @@ if __name__ == '__main__':
 
     m = MegaDenseUnet(1).cuda()
 
-    inpt = torch.randn((1,5,96,96)).cuda()
-    while True:
-        m(inpt)
+    # inpt = torch.randn((1,5,96,96)).cuda()
+    # while True:
+    #     m(inpt)
     torch.set_grad_enabled(False)
     m.eval()
     summary(m, (5, 1280, 720))
