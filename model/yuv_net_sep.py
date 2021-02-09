@@ -229,8 +229,9 @@ class _NetG(nn.Module):
         y_out = self.yconv(torch.cat([yuv_input[:,:1,...], grid], dim=1))
         c_out = self.cconv(yuv_input[:,1:3,...])
 
+        y_tmp = y_out
         y_out = torch.cat([y_out, self.cbam(c_out)], dim=1)
-        c_out = torch.cat([c_out, self.ybam(y_out), grid], dim=1)
+        c_out = torch.cat([c_out, self.ybam(y_tmp), grid], dim=1)
         c_out = torch.cat([self.cdown(c_out)], dim=1)
 
 
