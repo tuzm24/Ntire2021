@@ -195,7 +195,7 @@ class _NetG(nn.Module):
             nn.PReLU()
         )
         self.y_mid2 = nn.Sequential(
-            nn.Conv2d(in_channels=256, out_channels=256, kernel_size=3, stride=1, padding=1, bias=False),
+            nn.Conv2d(in_channels=256, out_channels=256, kernel_size=3, stride=2, padding=1, bias=False),
             nn.PReLU()
         )
         self.c_mid = nn.Sequential(
@@ -203,7 +203,7 @@ class _NetG(nn.Module):
             nn.PReLU()
         )
         self.c_mid2 = nn.Sequential(
-            nn.Conv2d(in_channels=256, out_channels=256, kernel_size=3, stride=1, padding=1, bias=False),
+            nn.Conv2d(in_channels=256, out_channels=256, kernel_size=3, stride=2, padding=1, bias=False),
             nn.PReLU()
         )
 
