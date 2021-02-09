@@ -242,12 +242,12 @@ class _NetG(nn.Module):
         out5 = self.recursive_E(c_out)
         out6 = self.recursive_F(out5)
 
-        recon1 = self.recon(out1)
-        recon2 = self.recon(out2)
-        recon3 = self.recon(out3)
-        recon4 = self.recon(out4)
-        recon5 = self.recon(out5)
-        recon6 = self.recon(out6)
+        recon1 = self.yrecon(out1)
+        recon2 = self.yrecon(out2)
+        recon3 = self.yrecon(out3)
+        recon4 = self.yrecon(out4)
+        recon5 = self.crecon(out5)
+        recon6 = self.crecon(out6)
 
         y_out = torch.cat([recon1, recon2, recon3, recon4], 1)
         c_out = torch.cat([recon5, recon6], 1)
