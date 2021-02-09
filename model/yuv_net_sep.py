@@ -178,11 +178,11 @@ class _NetG(nn.Module):
 
 
 
-        self.recursive_A = _Residual_Block(input_dim=257)
+        self.recursive_A = _Residual_Block()
         self.recursive_B = _Residual_Block()
         self.recursive_C = _Residual_Block()
         self.recursive_D = _Residual_Block()
-        self.recursive_E = _Residual_Block(input_dim=257)
+        self.recursive_E = _Residual_Block()
         self.recursive_F = _Residual_Block()
 
 
