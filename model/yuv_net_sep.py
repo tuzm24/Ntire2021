@@ -173,6 +173,7 @@ class _NetG(nn.Module):
             nn.PReLU(),
             nn.Conv2d(in_channels=128, out_channels=128, kernel_size=3, stride=2, padding=1, bias=False)
         )
+        self.maxpool = nn.MaxPool2d(2)
         self.cbam = CBAM(128)
         self.cdown = nn.Conv2d(in_channels=257, out_channels=256, kernel_size=3, stride=2, padding=1, bias=False)
 
@@ -231,7 +232,7 @@ class _NetG(nn.Module):
 
         y_tmp = y_out
         y_out = torch.cat([y_out, self.cbam(c_out)], dim=1)
-        c_out = torch.cat([c_out, self.ybam(y_tmp), grid], dim=1)
+        c_out = torch.cat([c_out, self.ybam(y_tmp), self.maxpool(grid)], dim=1)
         c_out = torch.cat([self.cdown(c_out)], dim=1)
 
 
