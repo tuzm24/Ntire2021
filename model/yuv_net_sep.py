@@ -213,7 +213,7 @@ class _NetG(nn.Module):
         self.yconv_output = nn.Sequential(nn.PixelShuffle(2),
                                           nn.Conv2d(in_channels=64, out_channels=1, kernel_size=3, stride=1, padding=1, bias=False))
         self.cconv_output = nn.Sequential(nn.PixelShuffle(2),
-                                          nn.Conv2d(in_channels=64, out_channels=3, kernel_size=3, stride=1, padding=1, bias=False),
+                                          nn.Conv2d(in_channels=64, out_channels=64, kernel_size=3, stride=1, padding=1, bias=False),
                                           nn.PixelShuffle(2),
                                           nn.Conv2d(in_channels=16, out_channels=2, kernel_size=3, stride=1, padding=1,
                                                     bias=False)
