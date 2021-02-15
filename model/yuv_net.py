@@ -175,7 +175,10 @@ class _NetG(nn.Module):
         self.recon = Recon_Block()
         #concat
 
-
+        self.conv_mid = nn.Conv2d(in_channels=1536, out_channels=256, kernel_size=1, stride=1, padding=0, bias=False)
+        self.relu3 = nn.PReLU()
+        self.conv_mid2 = nn.Conv2d(in_channels=256, out_channels=256, kernel_size=3, stride=1, padding=1, bias=False)
+        self.relu4 = nn.PReLU()
 
         self.subpixel = nn.PixelShuffle(2)
         self.conv_output = nn.Conv2d(in_channels=64, out_channels=3, kernel_size=3, stride=1, padding=1, bias=False)
