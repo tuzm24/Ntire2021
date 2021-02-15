@@ -81,6 +81,11 @@ class Model(nn.Module):
                 os.path.join(apath, 'model_latest.pt'),
                 **kwargs
             )
+        if resume == -2:
+            load_from = torch.load(
+                os.path.join(apath, 'model_best.pt'),
+                **kwargs
+            )
         elif resume == 0:
             if pre_train == 'download':
                 print('Download the model')
