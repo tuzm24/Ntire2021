@@ -6,6 +6,8 @@ import torch.nn as nn
 import torch.nn.parallel as P
 import torch.utils.model_zoo
 
+from help_torch_parallel import DataParallelModel
+
 class Model(nn.Module):
     def __init__(self, args, ckp):
         super(Model, self).__init__()
@@ -24,6 +26,8 @@ class Model(nn.Module):
 
         module = import_module('model.' + args.model.lower())
         self.model = module.make_model(args).to(self.device)
+        if self.n_GPUs > 1:
+            self.model = DataParallelModel(self.model)
         if args.precision == 'half':
             self.model.half()
 
@@ -42,10 +46,10 @@ class Model(nn.Module):
             self.model.set_scale(idx_scale)
 
         if self.training:
-            if self.n_GPUs > 1:
-                return P.data_parallel(self.model, x, range(self.n_GPUs))
-            else:
-                return self.model(x)
+            # if self.n_GPUs > 1:
+            #     return P.data_parallel(self.model, x, range(self.n_GPUs))
+            # else:
+            return self.model(x)
         else:
             if self.chop:
                 forward_function = self.forward_chop

@@ -5,8 +5,8 @@ from help_torch import YcbcrToRgb
 
 
 def make_model(args, parent=False):
-    # return _UUU(args)
-    pass
+    return _UUUU(args)
+    # pass
 
 
 class RDB_Conv(nn.Module):
@@ -119,8 +119,8 @@ class _Base_UNet(nn.Module):
 class _UUUU(nn.Module):
     def __init__(self, args):
         super(_UUUU, self).__init__()
-        self.isjpg = 3
-        # self.isjpg = args.jpeg_grid_add
+        # self.isjpg = 3
+        self.isjpg = args.jpeg_grid_add
         if self.isjpg:
             input_channel = self.isjpg
         else:
@@ -132,15 +132,15 @@ class _UUUU(nn.Module):
         self.relu2 = nn.PReLU()
 
         self.Unet1 = _Base_UNet()
-        self.Unet2 = _Base_UNet(in_channels=256*2)
-        self.Unet3 = _Base_UNet(in_channels=256*3)
-        self.Unet4 = _Base_UNet(in_channels=256*4)
-        self.Unet5 = _Base_UNet(in_channels=256*5)
-        self.Unet6 = _Base_UNet(in_channels=256*6)
+        self.Unet2 = _Base_UNet()
+        self.Unet3 = _Base_UNet()
+        self.Unet4 = _Base_UNet()
+        self.Unet5 = _Base_UNet()
+        self.Unet6 = _Base_UNet()
 
         self.conv_bottle = nn.Conv2d(in_channels=256*7, out_channels=256, kernel_size=1, stride=1, padding=0, bias=False)
 
-        self.num_dense = 12
+        self.num_dense = 4
         self.RDBs = nn.ModuleList()
         for i in range(self.num_dense):
             self.RDBs.append(
@@ -169,20 +169,15 @@ class _UUUU(nn.Module):
         out = self.relu1(self.conv_input(_input))
         out = self.relu2(self.conv_down(out))
 
-        out1 = self.Unet1(out)
-        out = torch.cat([out, out1], dim=1)
-        out1 = self.Unet2(out)
-        out = torch.cat([out, out1], dim=1)
-        out1 = self.Unet3(out)
-        out = torch.cat([out, out1], dim=1)
-        out1 = self.Unet4(out)
-        out = torch.cat([out, out1], dim=1)
-        out1 = self.Unet5(out)
-        out = torch.cat([out, out1], dim=1)
-        out1 = self.Unet6(out)
-        out = torch.cat([out, out1], dim=1)
+        outs = [out]
+        outs.append(self.Unet1(outs[-1]))
+        outs.append(self.Unet2(outs[-1]))
+        outs.append(self.Unet3(outs[-1]))
+        outs.append(self.Unet4(outs[-1]))
+        outs.append(self.Unet5(outs[-1]))
+        outs.append(self.Unet6(outs[-1]))
 
-        out = self.conv_bottle(out)
+        out = self.conv_bottle(torch.cat(outs, dim=1))
 
         RDBs_out = []
         for i in range(self.num_dense):

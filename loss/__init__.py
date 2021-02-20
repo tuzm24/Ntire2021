@@ -10,6 +10,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from help_torch_parallel import DataParallelCriterion
 
 class Loss(nn.modules.loss._Loss):
     def __init__(self, args, ckp):
@@ -37,6 +38,8 @@ class Loss(nn.modules.loss._Loss):
                     args,
                     loss_type
                 )
+            if args.n_GPUs >1:
+                loss_function = DataParallelCriterion(loss_function)
 
             self.loss.append({
                 'type': loss_type,

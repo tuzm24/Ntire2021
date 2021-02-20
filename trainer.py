@@ -170,7 +170,8 @@ class Trainer():
                             lr[:,:3,...] = rgb_to_ycbcr(lr[:,:3,...])
 
                         sr = self.model(lr, idx_scale)
-
+                    if self.args.n_GPUs>1:
+                        sr = torch.cat(sr, dim=0)
                     if self.args.jpeg_yuv_domain:
                         sr[:,:3,...] = ycbcr_to_rgb(sr[:,:3,...])
                         lr = rgb_to_ycbcr(lr[:,:3,...])

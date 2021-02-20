@@ -153,8 +153,8 @@ class Recon_Block(nn.Module):
 class _NetG(nn.Module):
     def __init__(self,args):
         super(_NetG, self).__init__()
-        self.isjpg = 3
-        # self.isjpg = args.jpeg_grid_add
+        # self.isjpg = 3
+        self.isjpg = args.jpeg_grid_add
         if self.isjpg:
             input_channel = self.isjpg
         else:
