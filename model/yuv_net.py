@@ -153,9 +153,10 @@ class Recon_Block(nn.Module):
 class _NetG(nn.Module):
     def __init__(self,args):
         super(_NetG, self).__init__()
-        self.isjpg = args.jpeg_grid_add
-        if args.jpeg_grid_add:
-            input_channel = args.jpeg_grid_add
+        self.isjpg = 3
+        # self.isjpg = args.jpeg_grid_add
+        if self.isjpg:
+            input_channel = self.isjpg
         else:
             input_channel = 3
         self.rgb_to_yuv = RgbToYcbcr()
@@ -224,3 +225,15 @@ class _NetG(nn.Module):
 
         out = self.yuv_to_rgb(out)
         return out
+
+if __name__ == '__main__':
+    from my_torchsummary import summary
+
+    m = _NetG(1).cuda()
+
+    # inpt = torch.randn((1,5,96,96)).cuda()
+    # while True:
+    #     m(inpt)
+    torch.set_grad_enabled(False)
+    m.eval()
+    summary(m, (3, 1280, 720))
