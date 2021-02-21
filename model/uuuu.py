@@ -149,7 +149,7 @@ class _UUUU(nn.Module):
 
 
         self.conv_mid = nn.Sequential(*[
-            nn.Conv2d(self.num_dense*256, 256, 1, padding=0, stride=1),
+            nn.Conv2d(self.num_dense*256 + 256, 256, 1, padding=0, stride=1),
             nn.Conv2d(256,256, kernel_size=3, padding=1, stride=1)
         ])
 
@@ -179,7 +179,7 @@ class _UUUU(nn.Module):
 
         out = self.conv_bottle(torch.cat(outs, dim=1))
 
-        RDBs_out = []
+        RDBs_out = [out]
         for i in range(self.num_dense):
             out = self.RDBs[i](out)
             RDBs_out.append(out)
