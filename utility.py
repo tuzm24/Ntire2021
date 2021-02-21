@@ -194,10 +194,16 @@ class checkpoint():
 
     def save_results(self, dataset, filename, save_list, scale):
         if self.args.save_results:
+            # filename = self.get_path(
+            #     'results-{}'.format(dataset.dataset.name),
+            #     '{}_x{}_'.format(filename, scale)
+            # )
             filename = self.get_path(
                 'results-{}'.format(dataset.dataset.name),
-                '{}_x{}_'.format(filename, scale)
+                '{}'.format(filename)
             )
+
+            os.makedirs(os.path.dirname(filename), exist_ok=True)
 
             postfix = ('SR', 'LR', 'HR')
             for v, p in zip(save_list, postfix):
