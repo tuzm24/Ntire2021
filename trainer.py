@@ -1,5 +1,3 @@
-import os
-import math
 from decimal import Decimal
 
 import utility
@@ -7,8 +5,8 @@ import utility
 import torch
 import torch.nn.utils as utils
 from tqdm import tqdm
-from help_torch import rgb_to_ycbcr
-from help_torch import ycbcr_to_rgb
+from help_func.help_torch import rgb_to_ycbcr
+from help_func.help_torch import ycbcr_to_rgb
 
 
 
@@ -152,6 +150,8 @@ class Trainer():
                 d.dataset.set_scale(idx_scale)
                 for lr, hr, filename in tqdm(d, ncols=80):
                     lr, hr = self.prepare(lr, hr)
+                    lr = lr[..., :1400, :1400]
+                    hr = hr[..., :1400, :1400]
                     if self.args.grid_batch:
                         b, n, c, h, w = lr.shape
                         _, _, _, h2, w2 = hr.shape
@@ -170,8 +170,10 @@ class Trainer():
                             lr[:,:3,...] = rgb_to_ycbcr(lr[:,:3,...])
 
                         sr = self.model(lr, idx_scale)
-                    if self.args.n_GPUs>1:
+                    if type(sr) == list:
                         sr = torch.cat(sr, dim=0)
+                    # if self.args.n_GPUs>1:
+                    #     sr = torch.cat(sr, dim=0)
                     if self.args.jpeg_yuv_domain:
                         sr[:,:3,...] = ycbcr_to_rgb(sr[:,:3,...])
                         lr = rgb_to_ycbcr(lr[:,:3,...])

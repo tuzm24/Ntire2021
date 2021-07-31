@@ -13,16 +13,16 @@ parser.add_argument('--n_threads', type=int, default=6,
                     help='number of threads for data loading')
 parser.add_argument('--cpu', action='store_true',
                     help='use cpu only')
-parser.add_argument('--n_GPUs', type=int, default=1,
+parser.add_argument('--n_GPUs', type=int, default=4,
                     help='number of GPUs')
 parser.add_argument('--seed', type=int, default=1,
                     help='random seed')
 
 # Data specifications
 
-parser.add_argument('--dir_data', type=str, default='ntire_deblur_track1',
+parser.add_argument('--dir_data', type=str, default='/data4',
                     help='dataset directory')
-parser.add_argument('--dir_demo', type=str, default='ntire_deblur_track1',
+parser.add_argument('--dir_demo', type=str, default='/data4',
                     help='demo image directory')
 
 # Validation Data test Frames (Must 30*n)
@@ -52,7 +52,7 @@ parser.add_argument('--scale', type=str, default='1',
                     help='super resolution scale')
 parser.add_argument('--patch_size', type=int, default=192,
                     help='output patch size')
-parser.add_argument('--rgb_range', type=int, default=255,
+parser.add_argument('--rgb_range', type=int, default=1,
                     help='maximum value of RGB')
 parser.add_argument('--n_colors', type=int, default=3,
                     help='number of color channels to use')
@@ -62,7 +62,7 @@ parser.add_argument('--no_augment', action='store_true',
                     help='do not use data augmentation')
 
 # Model specifications
-parser.add_argument('--model', default='EDSR',
+parser.add_argument('--model', default='RDN',
                     help='model name')
 
 parser.add_argument('--act', type=str, default='relu',
@@ -106,7 +106,7 @@ parser.add_argument('--test_every', type=int, default=1000,
                     help='do test per every N batches')
 parser.add_argument('--epochs', type=int, default=300,
                     help='number of epochs to train')
-parser.add_argument('--batch_size', type=int, default=16,
+parser.add_argument('--batch_size', type=int, default=8,
                     help='input batch size for training')
 parser.add_argument('--split_batch', type=int, default=1,
                     help='split the batch into smaller chunks')
@@ -118,7 +118,7 @@ parser.add_argument('--gan_k', type=int, default=1,
                     help='k value for adversarial loss')
 
 # Optimization specifications
-parser.add_argument('--lr', type=float, default=1e-4,
+parser.add_argument('--lr', type=float, default=1e-5,
                     help='learning rate')
 parser.add_argument('--decay', type=str, default='200',
                     help='learning rate decay type')

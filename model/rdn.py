@@ -87,6 +87,11 @@ class RDN(nn.Module):
                 nn.PixelShuffle(2),
                 nn.Conv2d(G, args.n_colors, kSize, padding=(kSize-1)//2, stride=1)
             ])
+        elif r== 1:
+            self.UPNet = nn.Sequential(*[
+                nn.Conv2d(G0, G, kSize, padding=(kSize-1)//2, stride=1),
+                nn.Conv2d(G, args.n_colors, kSize, padding=(kSize-1)//2, stride=1)
+            ])
         else:
             raise ValueError("scale must be 2 or 3 or 4.")
 

@@ -1,7 +1,7 @@
 import os
 from data import srdata
-from help_func import myUtil
-import glob
+from help_func.help_func import myUtil
+
 
 class Ntire2021(srdata.SRData):
     def __init__(self, args, name='DIV2K', train=True, benchmark=False):

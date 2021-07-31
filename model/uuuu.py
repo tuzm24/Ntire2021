@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
-from help_torch import RgbToYcbcr
-from help_torch import YcbcrToRgb
+from help_func.help_torch import RgbToYcbcr
+from help_func.help_torch import YcbcrToRgb
 
 
 def make_model(args, parent=False):

@@ -11,6 +11,7 @@ import torch
 import torch.utils.data as data
 import numpy as np
 
+
 class SRData(data.Dataset):
     def __init__(self, args, name='', train=True, benchmark=False):
         self.args = args
@@ -109,7 +110,7 @@ class SRData(data.Dataset):
             mask[:,8::8,0] = 128
             mask[7::8,:,0] = 128
             mask[8::8,:,0] = 128
-        return np.concatenate((img,mask), axis=2)
+        return np.concatenate((img, mask), axis=2)
 
 
     def __getitem__(self, idx):

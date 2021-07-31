@@ -3,10 +3,9 @@ from importlib import import_module
 
 import torch
 import torch.nn as nn
-import torch.nn.parallel as P
 import torch.utils.model_zoo
 
-from help_torch_parallel import DataParallelModel
+from help_func.help_torch_parallel import DataParallelModel
 
 class Model(nn.Module):
     def __init__(self, args, ckp):
@@ -112,7 +111,7 @@ class Model(nn.Module):
         if load_from:
             self.model.load_state_dict(load_from, strict=False)
 
-    def forward_chop(self, x, shave=40, min_size=160000):
+    def forward_chop(self, x, shave=40, min_size=1600000):
         def setShave(x_half):
             x = 0
             while (x_half + shave + x) % 16 !=0:
@@ -140,11 +139,11 @@ class Model(nn.Module):
 
         if w_size * h_size < min_size:
             sr_list = []
-            for i in range(0, 4, n_GPUs):
+            for i in range(0, 4, 1):
 
-                lr_batch = torch.cat(lr_list[i:(i + n_GPUs)], dim=0)
+                lr_batch = torch.cat(lr_list[i:(i + 1)], dim=0)
                 sr_batch = self.model(lr_batch)
-                sr_list.extend(sr_batch.chunk(n_GPUs, dim=0))
+                sr_list.extend(sr_batch)
         else:
             sr_list = [
                 self.forward_chop(patch, shave=shave, min_size=min_size) \

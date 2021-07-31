@@ -9,8 +9,7 @@ import numpy as np
 
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
-from help_torch_parallel import DataParallelCriterion
+from help_func.help_torch_parallel import DataParallelCriterion
 
 class Loss(nn.modules.loss._Loss):
     def __init__(self, args, ckp):

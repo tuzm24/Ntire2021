@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
-from help_torch import RgbToYcbcr
-from help_torch import YcbcrToRgb
+from help_func.help_torch import RgbToYcbcr
+from help_func.help_torch import YcbcrToRgb
 from model.cbam import CBAM
 def make_model(args, parent=False):
     return _NetG(args)

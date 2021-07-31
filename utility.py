@@ -17,7 +17,7 @@ import torch
 import torch.optim as optim
 import torch.optim.lr_scheduler as lrs
 import pandas as pd
-from help_func import myUtil
+from help_func.help_func import myUtil
 import shutil
 
 
@@ -94,6 +94,8 @@ class checkpoint():
 
     @staticmethod
     def GCExperience():
+        if not os.path.exists(os.path.join('..', 'experiment')):
+            return
         dir_list = myUtil.getDirlist(os.path.join('..', 'experiment'))
         for dir in dir_list:
             try:

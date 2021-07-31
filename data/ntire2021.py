@@ -1,7 +1,7 @@
 import os
 from data import srdata
-from help_func import myUtil
-import glob
+from help_func.help_func import myUtil
+
 
 class Ntire2021(srdata.SRData):
     def __init__(self, args, name='DIV2K', train=True, benchmark=False):
@@ -26,11 +26,11 @@ class Ntire2021(srdata.SRData):
         names_lr = [[]]
 
         for f in names_hr:
-            filename, _ = os.path.splitext(myUtil.getBaseDirnameAndBasename(f))
+#            filename, _ = os.path.splitext(myUtil.getBaseDirnameAndBasename(f))
 
             names_lr[0].append(os.path.join(
                 self.dir_lr, '{}{}'.format(
-                    filename, self.ext[1]
+                    os.path.splitext(os.path.basename(f))[0], self.ext[1]
                 )
             ))
         # if not self.train and not self.args.test_only:
@@ -45,8 +45,6 @@ class Ntire2021(srdata.SRData):
             names_hr = names_hr[::stride]
             names_lr = [n[::stride] for n in names_lr]
 
-
-
         # names_hr = names_hr[self.begin - 1:self.end]
         # names_lr = [n[self.begin - 1:self.end] for n in names_lr]
 
@@ -56,17 +54,17 @@ class Ntire2021(srdata.SRData):
         self.apath = dir_data
         dirs = myUtil.getDirlist(self.apath)
         if self.train:
-            self.dir_hr = myUtil.filteringPath(dirs, 'train_sharp')
-            self.dir_lr = myUtil.filteringPath(dirs, 'train_blur')
+            self.dir_hr = myUtil.filteringPath(dirs, 'train_HR')
+            self.dir_lr = myUtil.filteringPath(dirs, 'train_LR')
         if not self.train or self.dir_hr is None:
-            self.dir_hr = myUtil.filteringPath(dirs, 'val_sharp')
-            self.dir_lr = myUtil.filteringPath(dirs, 'val_blur')
-        if '_jpeg' in os.path.basename(self.dir_lr):
-            self.ext = ('.png', '.jpg')
-        else:
-            self.ext = ('.png', '.png')
-        self.dir_hr = myUtil.intoRealFolder(self.dir_hr)
-        self.dir_lr = myUtil.intoRealFolder(self.dir_lr)
+            self.dir_hr = myUtil.filteringPath(dirs, 'valid_HR')
+            self.dir_lr = myUtil.filteringPath(dirs, 'valid_LR')
+#        if '_jpeg' in os.path.basename(self.dir_lr):
+        self.ext = ('.png', '.jpg')
+#        else:
+#            self.ext = ('.png', '.png')
+#        self.dir_hr = myUtil.intoRealFolder(self.dir_hr)
+#        self.dir_lr = myUtil.intoRealFolder(self.dir_lr)
 
 
 
